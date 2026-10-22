@@ -128,7 +128,8 @@ def validate_manifest(value: Any) -> dict[str, Any]:
         digest = _non_empty_string(manifest[field], field=field, code="LINEAGE013")
         if len(digest) != 64 or any(char not in "0123456789abcdef" for char in digest):
             raise DataContractError("LINEAGE014", f"{field} must be a lowercase SHA-256 digest", {"field": field})
-    if not isinstance(manifest["record_count"], int) or manifest["record_count"] < 0:
+    count = manifest["record_count"]
+    if isinstance(count, bool) or not isinstance(count, int) or count < 0:
         raise DataContractError("LINEAGE015", "record_count must be a non-negative integer")
     if manifest["dataset"] != DATASET_NAME:
         raise DataContractError("LINEAGE016", "manifest dataset is unsupported", {"expected": DATASET_NAME})
