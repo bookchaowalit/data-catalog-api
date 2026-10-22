@@ -112,7 +112,9 @@ def main(argv: list[str] | None = None) -> int:
             # One JSON access line per request on stderr (no headers, tokens or queries).
             logging.basicConfig(level=logging.INFO, format="%(message)s", stream=sys.stderr)
             server = create_server(service, args.host, args.port)
-            print(f"{server.server_address[0]}:{server.server_address[1]}", flush=True)
+            host, port = server.server_address[:2]
+            assert isinstance(host, str)  # AF_INET/AF_INET6 servers report the host as text
+            print(f"{host}:{port}", flush=True)
             try:
                 server.serve_forever()
             except KeyboardInterrupt:

@@ -11,6 +11,7 @@ import tempfile
 import threading
 import time
 import unittest
+from collections.abc import Iterator
 from contextlib import contextmanager, redirect_stdout
 from pathlib import Path
 from unittest.mock import patch
@@ -27,7 +28,7 @@ MANIFEST = Path("data") / "manifests" / "resource_records.v1.manifest.json"
 
 
 @contextmanager
-def fixture_copy():
+def fixture_copy() -> Iterator[Path]:
     """Yield a temporary repository root holding a copy of data/ so tests never edit fixtures."""
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp)
@@ -43,7 +44,9 @@ class StoreContractTests(unittest.TestCase):
         self.assertEqual(len(dataset.records), 2)
         self.assertEqual(dataset.lineage.record_count, 2)
         self.assertEqual(dataset.lineage.source, "local-sanitized-fixture")
-        self.assertEqual(dataset.get("resource-001")["name"], "Ledger Lens")
+        record = dataset.get("resource-001")
+        assert record is not None
+        self.assertEqual(record["name"], "Ledger Lens")
 
     def test_tampered_manifest_fails_closed(self) -> None:
         with fixture_copy() as root:

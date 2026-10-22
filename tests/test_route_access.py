@@ -13,6 +13,7 @@ import os
 import unittest
 from contextlib import redirect_stdout
 from pathlib import Path
+from typing import Any
 from unittest.mock import patch
 
 from book_data_api import cli
@@ -73,7 +74,7 @@ class RouteAccessMatrixTests(unittest.TestCase):
 
 
 class UnauthenticatedBindTests(unittest.TestCase):
-    def _serve(self, *args: str) -> tuple[int, dict]:
+    def _serve(self, *args: str) -> tuple[int, dict[str, Any]]:
         with patch.dict(os.environ, {"BOOK_DATA_API_TOKEN": ""}), redirect_stdout(io.StringIO()) as out:
             code = cli.main(["serve", "--port", "0", "--allow-unauthenticated-local", *args])
         return code, json.loads(out.getvalue())
